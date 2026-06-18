@@ -1,6 +1,6 @@
 # Project Progress Orchestrator (PPO)
 
-> The first open-source release from DrC.ai — a skill for keeping autonomous projects moving.
+> A skill for keeping agents working toward a goal — without constant supervision.
 
 ---
 
@@ -8,30 +8,29 @@
 
 ```yaml
 name: project-progress-orchestrator
-description: Keep active projects moving cleanly with autonomous or manual work cycles. Designed to improve itself — the skill molds to your specific build patterns and goals through evidence-backed self-tightening after each cycle.
+description: Keep active projects moving with autonomous work cycles. When paired with scheduled crons and your agent runtime, this becomes a loop that orients, builds, verifies, and persists — staying silent unless there's real signal.
 ```
 
-The **Project Progress Orchestrator** (PPO) is a structured workflow pattern for autonomous agents that keeps projects moving without human micromanagement. It was developed by Dr. Justin Crosby as part of his work building agentic systems long before "agent loops" became a mainstream concept.
+**The problem:** You set up an agent to work on a project. It does one impressive thing, then stops. Or it loses track of what it was doing. Or it floods you with updates about nothing.
 
-This skill represents the foundational loop that powers autonomous project execution: orient, clean, choose, build, verify, review, persist, and communicate — all while respecting approval boundaries and staying silent unless there's real signal.
+**What this does:** PPO is a structured workflow that keeps an agent working toward a goal across hours, days, or weeks. It handles the boring but critical stuff: checking state before building, picking one concrete chunk, verifying the work, and persisting what happened. When paired with scheduled crons and your agent runtime, this is basically a loop.
 
-**What makes PPO different:** It improves itself. After every cycle, the skill evaluates its own performance, tightens procedures based on concrete failure patterns, and molds to your specific build patterns and project goals. The loop learns what works for *your* codebase, *your* team, and *your* delivery cadence — not generic best practices.
+**What makes it different:** The skill tightens itself. After each cycle, it evaluates what worked and what didn't, then adjusts its own procedures based on actual failure patterns. It molds to your codebase, your team, and your delivery cadence — not generic best practices.
 
 ---
 
 ## The Story
 
-In early 2026, I started building R2 — an AI assistant that could actually get things done without me watching every step. The problem: most agent demos were impressive one-offs, but none could sustain meaningful work across days or weeks.
+I built this for R2 — my AI assistant. I needed something that could make real progress on projects without me watching every step. The agent needed to:
 
-I needed a loop. Something that could:
-- Wake up, understand where a project stood
+- Wake up and understand where a project stood
 - Clean up stale state before building
 - Pick one concrete, unblocked chunk
 - Build it, verify it, review it
 - Persist what happened
-- Stay quiet unless there was something I needed to know
+- Stay quiet unless there was something I actually needed to know
 
-PPO emerged from that need. It predates the "agent loop" terminology that became popular later. This was just how I taught R2 to work.
+PPO emerged from that need. It has run thousands of cycles since early 2026. This is the pattern I use to keep projects moving.
 
 ---
 
@@ -64,7 +63,6 @@ See [`SKILL.md`](SKILL.md) for the complete specification including:
 - Reviewer Finding Contract (enforceable state, not prose)
 - PM Escalation Template for human-in-the-loop decisions
 - Digest patterns for twice-daily summaries
-- Claude/Opus routing guards
 - Delivery wiring requirements
 
 ---
@@ -88,13 +86,13 @@ While PPO defines the loop for a single project, Praxis extends it to:
 - **Evaluator contracts** — machine-checkable outputs instead of prose claims
 - **Meta-harness layering** — coordination across multiple projects
 
-PPO proved the internal loop works. Praxis turns that proof into a product.
+PPO proved the internal loop works. Praxis turns that pattern into a product.
 
 ---
 
 ## Who Built This
 
-**Dr. Justin Crosby** — a physician and systems thinker who started building with AI agents in early 2026. This is his first public open-source release. DrC.ai is his vehicle for exploring how autonomous agents can actually get things done.
+**Dr. Justin Crosby** — a physician and systems thinker exploring how autonomous agents can actually get things done. This is my first public open-source release. DrC.ai is where I share what I'm building.
 
 ---
 
@@ -112,9 +110,7 @@ This repo includes a **generic version** (`SKILL.md`) with placeholders for easy
 
 1. Read `SETUP.md` for customization instructions
 2. Replace placeholders (`<USER_NAME>`, `<PM_TOPIC_ID>`, etc.) with your values
-3. See `SKILL-ORIGINAL.md` for the author's reference implementation
-
-The skill works with any runtime that can trigger the 10-step loop and handle messaging.
+3. The skill works with any runtime that can trigger the 10-step loop and handle messaging
 
 ---
 
@@ -128,7 +124,3 @@ MIT — Use it, fork it, build on it. If you find it useful, let us know what yo
 
 - DrC.ai — [drc.ai](https://drc.ai)
 - Built with R2 — the agent that runs on this loop every day
-
----
-
-> *"The loop is the product. Everything else is packaging."*
