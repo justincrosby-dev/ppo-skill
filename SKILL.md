@@ -110,7 +110,7 @@ Use this sequence for each project cycle, whether triggered manually or by cron:
    - If branch/worktree drift is detected, classify it as process drift, pause the affected build loop, and do not keep posting repeated project-topic blockers.
 
 4. **Choose one concrete unblocked chunk**
-   - Before selecting a new chunk, check today's and yesterday's memory plus the checkpoint and latest reviewer note for open reviewer-noted quality failures. Resolve the failure or explicitly carry it forward in state before starting unrelated product work. A reviewer "fix this before continuing" note supersedes the normal next-chunk suggestion.
+   - Before selecting a new chunk, check today's and yesterday's memory plus the checkpoint and latest reviewer note for open reviewer-noted quality failures. Resolve the failure or explicitly carry it forward in state before starting unrelated product work. A reviewer “fix this before continuing” note supersedes the normal next-chunk suggestion.
    - If an open reviewer note names a specific file, route, CTA, broken link, or stale claim, the next builder chunk must address that exact item before normal next-chunk work. Search the full current/yesterday memory and checkpoint case-insensitively for reviewer notes (`Reviewer Finding`, `reviewer finding`, `reviewer-hard-stop`, `quality issue`) instead of relying only on bounded file heads, then grep/read the named file to prove the issue is gone. Do not treat adjacent approval-boundary polish as sufficient unless the named issue is resolved or explicitly carried forward as blocked.
 
    **Reviewer Finding Contract — enforceable state, not prose**
@@ -135,7 +135,7 @@ Use this sequence for each project cycle, whether triggered manually or by cron:
 
 6. **Verify before claiming progress**
    - Run the smallest meaningful gate: lint/build/test/grep/diff inspection.
-   - **Touched Artifact Invariants:** every directly mutated file, route, record, slug, prompt, or state section must satisfy the project-level invariant for that surface before completion. Examples: data records have required source/date fields; routed pages pass canonical/link/page-shape/protected-preview checks; state docs have current `Last verification`/build-log entries. Transitive references are not "touched" unless directly edited.
+   - **Touched Artifact Invariants:** every directly mutated file, route, record, slug, prompt, or state section must satisfy the project-level invariant for that surface before completion. Examples: data records have required source/date fields; routed pages pass canonical/link/page-shape/protected-preview checks; state docs have current `Last verification`/build-log entries. Transitive references are not “touched” unless directly edited.
    - If no invariant exists for a touched surface, the builder may propose the smallest invariant as an open finding for reviewer acceptance, but must not author a loose same-cycle invariant and count it as proof. Reviewer acceptance must be recorded in the declared `open_findings_file` as `invariant-accepted: <gate>` before that invariant becomes a closure gate. Until accepted, use existing validators plus explicit evidence and carry the missing invariant forward for at most two reviewer evaluations; on the third evaluation it becomes a blocking finding or must be rejected/collapsed. A reviewer evaluation means a quality reviewer run where the specific finding, invariant, or self-improvement failure mode is in scope and explicitly assessed.
    - Invariant failure is verification failure unless it is recorded as a named open finding with owner, target, and next gate. Do not bury it as vague freshness or quality debt.
    - If the cycle commits before final persistence/review, run committed-diff hygiene (`git show --check HEAD` or equivalent) before claiming the committed artifact is clean.
@@ -154,7 +154,7 @@ Use this sequence for each project cycle, whether triggered manually or by cron:
    - Update project status/checkpoint/memory with facts only: changed files, completed chunk, verification, blocker, next chunk.
    - A cycle is incomplete until durable state records: commit hash or explicit uncommitted reason, changed files, exact verifier commands/results, protected-preview/external-boundary checks when relevant, open findings with statuses, remaining invariant gaps, and next chunk.
    - Commit-only is not completion. State may land in the same commit or in a follow-up state commit inside the same cycle window; the cycle, not the first commit, is the unit of completion.
-   - Write `cycle-complete: <commit-or-state-ref> @ <timestamp>` as the final persistence marker for every claimed cycle. If the project has `open_findings_file`, write it there; otherwise write it in the project checkpoint or status file. Missing marker means no full `PASS`; if a completion summary exists without the marker, the next reviewer must classify `PARTIAL` or `FAIL` depending on evidence.
+   - Write `cycle-complete: <commit-or-state-ref> @ <timestamp>` as the final persistence marker for every claimed cycle. If the project has `open_findings_file`, write it there; otherwise write it in the project checkpoint or status file. Missing marker means no full `PASS`; if a completion summary exists without the marker, classify `PARTIAL` or `FAIL` depending on evidence.
    - Use the actual completed run timestamp for each logged cycle; do not relabel earlier cycles with the next scheduled run time or current wall-clock time.
    - After verification, replace any provisional verification placeholders in persisted logs/docs (for example "pending final verification") with the actual gate result before committing.
    - If the project source of truth has a dedicated `Last verification`, `Last verified state`, or equivalent section, prepend the latest completed cycle there; updating only the header/status line is stale-state persistence, not complete persistence.
@@ -228,21 +228,10 @@ For active build lanes, use two layers instead of one overloaded job:
 
 1. **Builder loop** every 30–60 min, 24/7 (overnight and weekends included): cleanup-first, one chunk, verify, persist. Pause only on `.r2-pause` / `r2-pause-until:` signals or explicit maintenance windows.
 2. **Quality reviewer/reconciler** every 30–60 min during intense autonomous work: review recent cycles across active projects for measurable progress and output quality, persist findings silently, then apply bounded prompt/skill tuning only when a concrete failure pattern is observed.
-3. **Twice-daily digest/reconciler** at 9 AM and 9 PM ET: summarize completed work from the prior 12 hours, planned work for the next 12 hours, detect drift, identify blockers, and propose cron changes. Digest jobs are the reporting surface for normal PPO activity, and they must be written for a human project owner first: plain-language outcomes, why they matter, blockers/decisions, and what happens next. Technical evidence can be included briefly only when it helps trust the report; do not turn the digest into an internal cron/run-history trace.
+3. **Twice-daily digest/reconciler** at 9 AM and 9 PM ET: summarize completed work from the prior 12 hours, planned work for the next 12 hours, detect drift, identify blockers, and propose cron changes. Digest jobs are the reporting surface for normal PPO activity, and they must be written for a human project owner first: plain-language outcomes, why they matter, blockers/decisions, and what happens next. Technical evidence can be included briefly only when it helps trust the report; do not turn the digest into an internal cron/run log.
 
 Use heartbeat only for cheap checks. Do not use heartbeat for project builds.
 
-
-### Claude / Opus routing guard (required for every future PPO cron)
-
-Every future PPO cron must be safe to re-enable without creating API or OAuth spend surprises. Apply this even to disabled/staged jobs.
-
-- Default PPO payload model: `codex` for frontier orchestration or an approved local model for simple digest/review. Never set a PPO cron payload model to `opus`, `sonnet`, `haiku`, `anthropic/*`, or any Claude/Anthropic alias.
-- If the project truly needs Claude/Opus-quality help, the cron prompt must say: Claude Desktop/local subscription path only.
-- The prompt must explicitly forbid Anthropic API, OpenRouter Anthropic, direct Anthropic SDK/curl, Claude Code OAuth, Claude CLI OAuth, and `sessions_spawn` with `opus` / `sonnet` / `haiku`.
-- If Claude Desktop/local subscription access cannot be verified from the Mac mini desktop session, the cron must stop and report a blocker. It must not fall back to API or OAuth.
-- If Claude is not needed, say so explicitly: `No Claude/Opus/Anthropic use in this cron.`
-- Before enabling or re-enabling a PPO cron, audit the payload and description for the guard above.
 
 ### Delivery wiring (required for every PPO cron)
 
@@ -289,8 +278,80 @@ Read-only inputs:
 - Declared open findings file, if present: <PATH>.
 - ACTIVE_LANES/BACKLOG only if needed to detect drift.
 
-Claude/Opus routing: No Claude/Opus/Anthropic use in this cron. Do not use Anthropic API, OpenRouter Anthropic, direct Anthropic SDK/curl, Claude Code OAuth, Claude CLI OAuth, or sessions_spawn with opus/sonnet/haiku.
-
 Output decision tree:
 1. Count material builder `cycle-complete` markers, verified commits/artifacts, closed findings, new blockers, or named project-scope decisions in the prior 12 hours.
-2. If zero material completions, zero new block
+2. If zero material completions, zero new blockers, zero new/changed open findings, and no drift that needs Justin, reply exactly `NO_REPLY`.
+3. If there is material signal, send one concise digest to the project topic only.
+
+Digest format:
+PPO Digest — <PROJECT> — <AM/PM window>
+What changed: <1-4 plain-English bullets describing completed outcomes and why they matter; include evidence in parentheses only when useful>
+What is ready/usable now: <none or short bullets describing the practical effect for the project>
+Open quality issues: <none or 1-4 human-readable issues; include IDs/severity/next gate only after the explanation>
+Need from Justin: <none or exact decision/input in ordinary language>
+Next 12h: <1-3 planned chunks stated as outcomes, with acceptance gates in brief parentheses>
+Drift watch: <none or named drift in human terms; do not alarm on first-cycle minor drift>
+
+Hard rules:
+- No progress preambles such as “Let me check,” “I'll read,” or “Now I'll inspect.” The first and only assistant message is the final digest or exactly `NO_REPLY`.
+- The digest is human-facing. Do not lead with job IDs, session IDs, raw run histories, internal workflow mechanics, or technical implementation minutiae unless they are needed to explain a blocker or prove a result.
+- Digest never posts routine output to the PM topic.
+- Digest never creates or edits findings; it reports existing state.
+- Failed/partial digest inspection must not fabricate a digest. If evidence is insufficient but no Justin action is required, return `NO_REPLY` and let the next cycle retry.
+```
+
+## Standard Cron Prompt Template
+
+```text
+You are running the <PROJECT> autonomous project-progress loop.
+
+Goal: keep <PROJECT> moving cleanly toward <ARCHITECTURE_OR_PLAN>.
+
+Before building:
+1. Read source of truth: <FILES>.
+2. Reconcile stale/contradictory status, checkpoint, memory, and project-file notes.
+3. Identify the active Linear issue/job. Confirm the current branch/worktree matches it, or create/switch to an issue-scoped branch/worktree before implementation. Record branch/worktree on the Linear issue when Linear is available.
+4. If previous run left dirty/unverified work, verify or document it before starting new work.
+5. If latest reviewer status is PARTIAL/FAIL or the source of truth has `Open Findings`, confirm the declared `open_findings_file`, then enumerate `Findings to resolve this cycle:` with IDs, targets, required evidence, and gates in that file before editing. Resolve/block/carry those findings before unrelated work.
+
+Then choose exactly one smallest useful unblocked chunk.
+Allowed: local file edits, local tests/builds, internal docs, local-only UI/data plumbing, source-of-truth updates.
+Blocked without explicit human approval: external sends/outreach, publish/deploy, purchases, runtime/config changes, package installs, PHI/PII/EHR/payer/customer-data access, provider billing, command runners, real money movement, or production mutations.
+
+Verification required before claiming completion: <COMMANDS_OR_GATES>, plus touched-artifact invariants for every directly mutated file/route/record/slug/state section.
+Post-verification required: bug-check any build/test/lint session, then do one review/edit pass for accuracy, completeness, logic, sanity, stale claims, and approval-boundary leakage across all outputs.
+Persistence required: update project docs/checkpoint and memory with completed chunk, verification, blocker if any, open finding statuses in the declared `open_findings_file`, invariant gaps/accepted invariants if any, next concrete chunk, and a final `cycle-complete` marker in the declared findings file when present, otherwise checkpoint/status.
+
+Cadence discipline: target one verified chunk; do not run past the next scheduled slot. If blocked or another run is active, log the blocker and stop.
+
+Completion discipline: if this cron's milestone/work package is complete, persist completion, disable and delete this finite cron set, and do not emit another routine status on the next interval. Follow-on work requires a newly scoped cron set for the next milestone.
+
+Routing rules for this cycle:
+- Routine build-session output, verified-chunk summaries, cleanup notes, routine reviewer findings, and small Linear/comments must be silent. Return `NO_REPLY`; the next 9 AM / 9 PM digest will summarize material work.
+- Immediately message the project topic only when Justin must act, there is a major issue, a recurring minor issue R2 cannot fix, drift is detected, or a finite work package is done and its crons are paused/retired.
+- Real blockers, approval requests, user-decision questions, failed verification you cannot resolve, unsafe ambiguity, or architectural choices go as a separate message to Project Manager topic `telegram:-1003732476287:topic:3521` using the PM Escalation Template above; then drop a one-line pointer in the project topic.
+- Never route routine build reports to the Project Manager topic.
+- PM-topic messages must start with `[<PROJECT>] [<URGENCY>] [<KIND>]` and include Context / Need from Justin / Impact sections.
+
+Reply `NO_REPLY` unless immediate-signal criteria above are met.
+```
+
+## What To Watch For
+
+- **Busy loop without value:** many runs, no verified artifact. Tighten prompt to require one named outcome and a gate.
+- **Telegram clutter:** build/reviewer jobs post routine loop results instead of staying silent until the 9 AM / 9 PM digest. Tighten the prompt immediately; routine progress is not signal.
+- **Branch/worktree drift:** multiple agents edit the same worktree or a build runs on a branch unrelated to the active Linear issue. Pause the loop, preserve evidence, move the job into an issue-scoped branch/worktree, and resume only once isolation is clean.
+- **State bloat:** logs/memory grow but source-of-truth remains stale. Require cleanup first and short factual memory entries.
+- **Approval-bound thrash:** agent keeps rediscovering blocked work. Add an approval-boundary ledger and permitted internal-only fallback list.
+- **Overlapping runs:** run duration approaches/exceeds schedule. Stagger jobs, lengthen interval, add skip instruction, or split daily digest from builder.
+- **Silent failure:** `NO_REPLY` hides failed verification. Prompt must notify on failed gate/blocker.
+- **Uncommitted ambiguity:** if workspace is already dirty, commit only scoped changes or explicitly defer commit with reason.
+- **Output drift:** passing builds but weak artifacts, stale docs, or incoherent next steps. Require a named review/edit pass and inspect the artifact, not just the command output.
+- **Self-improvement drift:** cron keeps changing instructions without evidence. Only tune prompts/skill after a repeated or clearly documented failure mode, keep a short rationale in memory/project files, and define the rollback/collapse trigger before adding the new rule.
+- **Reviewer prose drift:** reviewer FAIL/PARTIAL is treated like a suggestion rather than state. Require an `Open Findings` entry and fail the next builder if it does not enumerate and address those IDs first.
+- **Invariant loophole:** builder authors a same-cycle validator/invariant that merely blesses its current work. New invariants require reviewer acceptance before they count as closure gates.
+
+## References
+
+- Read `references/proven-patterns.md` when designing or revising cron architecture.
+- Read `references/runbook.md` when executing a cleanup/continuation cycle or writing a new project prompt.
