@@ -43,6 +43,10 @@ The simplest version needs only:
 2. A project status file to read/write
 3. A way to message the user (for blockers/summaries)
 
-## Original Reference
+## Adapting This Skill
 
-See `SKILL-ORIGINAL.md` for the author's original version with their specific configuration (R2 agent, Justin's setup, etc.).
+This is a generic template. Adapt it to your:
+- Agent name and personality
+- Communication channels (Telegram, Discord, Slack, etc.)
+- Project management tools (Linear, GitHub Issues, etc.)
+- Host environment and runtime
