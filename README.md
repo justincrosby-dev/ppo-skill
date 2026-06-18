@@ -100,13 +100,21 @@ PPO proved the internal loop works. Praxis turns that proof into a product.
 
 ## Usage
 
-PPO is designed to run inside [OpenClaw](https://github.com/openclaw/openclaw) (or compatible agent runtimes) via scheduled cron jobs:
+PPO is designed to run inside [OpenClaw](https://github.com/openclaw/openclaw) or compatible agent runtimes via scheduled cron jobs:
 
 - **Builder loop** — every 30-60 min: cleanup-first, one chunk, verify, persist
 - **Quality reviewer** — evaluates recent cycles for measurable progress
 - **Twice-daily digest** — 9 AM / 9 PM summaries for human visibility
 
-See `SKILL.md` for complete cron templates and configuration.
+### Getting Started
+
+This repo includes a **generic version** (`SKILL.md`) with placeholders for easy adaptation:
+
+1. Read `SETUP.md` for customization instructions
+2. Replace placeholders (`<USER_NAME>`, `<PM_TOPIC_ID>`, etc.) with your values
+3. See `SKILL-ORIGINAL.md` for the author's reference implementation
+
+The skill works with any runtime that can trigger the 10-step loop and handle messaging.
 
 ---
 
