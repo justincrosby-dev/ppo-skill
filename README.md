@@ -6,6 +6,11 @@
 
 ## What This Is
 
+```yaml
+name: project-progress-orchestrator
+description: Keep active projects moving cleanly with autonomous or manual work cycles: cleanup-first project continuation, scheduled cron/agentTurn design, stale source-of-truth reconciliation, checkpoint/memory updates, verification gates, approval-boundary handling, and silent-unless-signal progress loops. Use when asked to keep a project moving, design/update recurring project-builder crons, clean up after autonomous runs, continue all unblocked work, audit whether scheduled runs made real progress, or generalize a project-progress workflow into reusable automation.
+```
+
 The **Project Progress Orchestrator** (PPO) is a structured workflow pattern for autonomous agents that keeps projects moving without human micromanagement. It was developed by Dr. Justin Crosby as part of his work building agentic systems long before "agent loops" became a mainstream concept.
 
 This skill represents the foundational loop that powers autonomous project execution: orient, clean, choose, build, verify, review, persist, and communicate — all while respecting approval boundaries and staying silent unless there's real signal.
