@@ -21,7 +21,7 @@ This skill represents the foundational loop that powers autonomous project execu
 
 ## The Story
 
-In early 2025, I started building R2 — an AI assistant that could actually get things done without me watching every step. The problem: most agent demos were impressive one-offs, but none could sustain meaningful work across days or weeks.
+In early 2026, I started building R2 — an AI assistant that could actually get things done without me watching every step. The problem: most agent demos were impressive one-offs, but none could sustain meaningful work across days or weeks.
 
 I needed a loop. Something that could:
 - Wake up, understand where a project stood
@@ -94,7 +94,7 @@ PPO proved the internal loop works. Praxis turns that proof into a product.
 
 ## Who Built This
 
-**Dr. Justin Crosby** — a physician and systems thinker who started building with AI agents in early 2025. This is his first public open-source release. DrC.ai is his vehicle for exploring how autonomous agents can actually get things done.
+**Dr. Justin Crosby** — a physician and systems thinker who started building with AI agents in early 2026. This is his first public open-source release. DrC.ai is his vehicle for exploring how autonomous agents can actually get things done.
 
 ---
 
